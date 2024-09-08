@@ -10,14 +10,12 @@ class Bucket
         @encryption = false
         @versioning = false
         @mfa_delete = false 
-        @blocks_public_access = false
+        @block_public_access = false
     end
 
     def check_encryption 
         resp = @client.get_bucket_encryption(bucket: @name)
-        if !resp.server_side_encryption_configuration.nil?
-            @encryption = true
-        end
+        @encryption = !resp.server_side_encryption_configuration.nil?
     rescue Aws::S3::Errors::ServerSideEncryptionConfigurationNotFoundError
         puts "Bucket #{@name} does not have encryption enabled."
     end
@@ -33,9 +31,9 @@ class Bucket
         public_access_conf = resp.public_access_block_configuration
 
         @block_public_access = public_access_conf.block_public_acls &&
-        public_access_conf.ignore_public_acls &&
-        public_access_conf.block_public_policy &&
-        public_access_conf.restrict_public_buckets
+                                public_access_conf.ignore_public_acls &&
+                                public_access_conf.block_public_policy &&
+                                public_access_conf.restrict_public_buckets
     rescue Aws::S3::Errors::NoSuchPublicAccessBlockConfiguration
         puts "Bucket #{@name} does not have 'Block public access (bucket settings)' configured."
     end
