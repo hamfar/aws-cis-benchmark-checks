@@ -1,0 +1,10 @@
+
+*.gem
+/.config
+
+
+## Environment normalization:
+/.bundle/
+/vendor/bundle
+
+.env
