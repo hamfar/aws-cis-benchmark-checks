@@ -2,12 +2,15 @@ require 'aws-sdk-s3'
 
 class Bucket 
     attr_reader :name
-    attr_accessor :encryption, :versioning, :mfa_delete
+    attr_accessor :encryption, :versioning, :mfa_delete, :block_public_access
 
     def initialize(name, client)
         @name = name
         @client = client 
         @encryption = false
+        @versioning = false
+        @mfa_delete = false 
+        @blocks_public_access = false
     end
 
     def check_encryption 
@@ -26,17 +29,25 @@ class Bucket
     end
 
     def check_block_public_access
-        resp = @client.get_bucket_public_access_block(bucket: @name)
-        block_public_access = resp.public_access_block_configuration
+        resp = @client.get_public_access_block(bucket: @name)
+        public_access_conf = resp.public_access_block_configuration
 
-        if block_public_access.block_public_acls && block_public_access.ignore_public_acls && 
-            block_public_access.block_public_policy && block_public_access.restrict_public_buckets 
-            puts "Bucket #{@name} is configured with 'Block public access (bucket settings)'."
-        else
-            puts "Bucket #{@name} is NOT configured with 'Block public access (bucket settings)'."
-        end
+        @block_public_access = public_access_conf.block_public_acls &&
+        public_access_conf.ignore_public_acls &&
+        public_access_conf.block_public_policy &&
+        public_access_conf.restrict_public_buckets
     rescue Aws::S3::Errors::NoSuchPublicAccessBlockConfiguration
         puts "Bucket #{@name} does not have 'Block public access (bucket settings)' configured."
+    end
+    
+    def to_hash 
+        {
+            name: @name,
+            encryption_enabled: @encryption, 
+            versioning: @versioning, 
+            mfa_on_delete: @mfa_delete,
+            block_public_access: @block_public_access
+        }
     end
 
 end

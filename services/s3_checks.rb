@@ -14,11 +14,12 @@ class S3Checks
     end
 
     def run_checks 
-        results = @buckets.map do |bucket|
+        @buckets.each do |bucket|
             bucket.check_encryption
-            {name: bucket.name, encryption_enabled: bucket.encryption, versioning: bucket.versioning, mfa_on_delet: bucket.mfa_delete}
+            bucket.check_versioning
+            bucket.check_block_public_access
         end
-        return results
+        @buckets.map(&:to_hash)
     end
 
 end
