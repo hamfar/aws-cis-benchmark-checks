@@ -2,7 +2,7 @@ require 'aws-sdk-s3'
 
 class Bucket 
     attr_reader :name
-    attr_accessor :encryption
+    attr_accessor :encryption, :versioning, :mfa_delete
 
     def initialize(name, client)
         @name = name
@@ -17,6 +17,12 @@ class Bucket
         end
     rescue Aws::S3::Errors::ServerSideEncryptionConfigurationNotFoundError
         puts "Bucket #{@name} does not have encryption enabled."
+    end
+
+    def check_versioning
+        resp = @client.get_bucket_versioning(bucket: @name)
+        @versioning = resp.status
+        @mfa_delete = resp.mfa_delete
     end
 
     def check_block_public_access

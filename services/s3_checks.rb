@@ -16,7 +16,7 @@ class S3Checks
     def run_checks 
         results = @buckets.map do |bucket|
             bucket.check_encryption
-            {name: bucket.name, encryption_enabled: bucket.encryption}
+            {name: bucket.name, encryption_enabled: bucket.encryption, versioning: bucket.versioning, mfa_on_delet: bucket.mfa_delete}
         end
         return results
     end
