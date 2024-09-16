@@ -1,14 +1,14 @@
 require 'aws-sdk'
 require_relative 'services/s3_checks'
-
-
-def create_client(profile)
-    Aws::S3::Client.new(profile: profile)
-end
+require_relative 'services/iam_checks'
+require 'aws-sdk-iam'
 
 def run_checks_for_profile(profile)
-    s3_client = create_client(profile)
+    s3_client = Aws::S3::Client.new(profile: profile)
     s3_checks = S3Checks.new(s3_client)
+    iam_client = Aws::IAM::Client.new
+    iam_checks = Iam_checks.new(iam_client)
+    iam_checks.run_checks
     s3_checks.run_checks
 end
 

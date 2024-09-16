@@ -1,8 +1,7 @@
 require 'aws-sdk-s3'
 
 class Bucket 
-    attr_reader :name
-    attr_accessor :encryption, :versioning, :mfa_delete, :block_public_access
+    attr_accessor :name, :encryption, :versioning, :mfa_delete, :block_public_access
 
     def initialize(name, client)
         @name = name
